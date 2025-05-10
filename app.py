@@ -14,6 +14,7 @@ from dateutil.relativedelta import relativedelta
 import copy
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import generate_csrf
+import platform
 
 
 app = Flask(__name__)
@@ -27,7 +28,11 @@ db.init_app(app)  # ✅ bind db to app here
 migrate = Migrate(app, db)  # Bind migrate to your app and db
 
 # Absolute path to wkhtmltopdf.exe
-path_to_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+if platform.system() == "Windows":
+    path_to_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+else:
+    path_to_wkhtmltopdf = '/usr/bin/wkhtmltopdf'  # Linux path on Render
+
 config = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
 
 csrf = CSRFProtect(app)
