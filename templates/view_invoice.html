@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}Invoice #{{ invoice.id }} Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="page-head gr-bg-white">
+    <div class="fancy-heading">🧾 Invoice #{{ invoice.id }}</div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('show_invoice_pdf', invoice_id=invoice.id) }}" class="icon-gradient gr-bg-orange act-btn" title="View Invoice" target="_blank"><i class="bi bi-eye"></i> View</a>
+      <a href="{{ url_for('invoice_pdf', invoice_id=invoice.id) }}" class="icon-gradient gr-bg-green-h act-btn" title="Download PDF"><i class="bi bi-download"></i> Save</a>
+      <a href="{{ url_for('edit_invoice', invoice_id=invoice.id) }}" class="icon-gradient gr-bg-blue-h act-btn" title="Edit Invoice"><i class="bi bi-pencil-square"></i> Edit</a>
+      <form method="POST" action="{{ url_for('delete_invoice', invoice_id=invoice.id) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this invoice?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="icon-gradient gr-bg-red-h act-btn" title="Delete Invoice"><i class="bi bi-trash3"></i> Delete</button>
+      </form>
+      {% if source == 'student' %}<a href="{{ url_for('view_student', student_id=student.id) }}" class="btn-gradient btn-blue" title="Back to Student View"><i class="fa-solid fa-reply"></i> Back</a>
+      {% else %}<a href="{{ url_for('invoices') }}" class="btn-gradient btn-blue" title="Back to Invoices"><i class="fa-solid fa-reply"></i> Back</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="bg-white border rounded-4 shadow-sm p-4 mb-4 text-black">
+    <!-- Logo and Info Row -->
+    <div class="row align-items-center mb-4">
+      <div class="col-md-3 text-start">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Left Logo" class="img-fluid" style="max-width: 200px;">
+      </div>
+      <div class="col-md-6 text-center">
+        <h1 class="mb-0">Study Master</h1>
+        <p class="mb-0">Naharpur Village, Sector 7,</p>
+        <p class="mb-0">Rohini, Delhi-110085</p>
+        <p class="mb-0">Contact No: 9818401912</p>
+      </div>
+      <div class="col-md-3 text-end">
+        <p class="text-end mb-1">Scan to Pay</p>
+        <img src="{{ url_for('static', filename='images/qrcode.jpg') }}" alt="QR Code" class="img-fluid" style="max-width: 140px;">
+      </div>
+    </div>
+
+    <h2 class="text-primary text-center mb-4 fw-bold fs-1 mt-4">Invoice</h2>
+
+    <!-- Student and Invoice Details -->
+    <hr style="margin: 20px 0;">
+    <div style="display: flex; justify-content: space-between; gap: 30px; width: 100%;">
+      <!-- Left Table -->
+      <table>
+        <thead class="text-success">
+          <th style="font-size: 20px; padding-bottom: 10px;">Student Details:</th>
+        </thead>
+        <tbody style="font-size: 14px;">
+          <tr>
+            <td><strong>Name:</strong></td>
+            <td>{{ student.name }}</td>
+          </tr>
+          <tr>
+            <td><strong>Class:</strong></td>
+            <td>{{ student.class_name }}</td>
+          </tr>
+          <tr>
+            <td><strong>Contact:</strong></td>
+            <td>+91-{{ student.mobile }}</td>
+          </tr>
+          <tr>
+            <td><strong>Email:</strong></td>
+            <td>{{ student.email }}</td>
+          </tr>
+          <tr>
+            <td><strong>School:</strong></td>
+            <td>{{ student.school }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Right Table -->
+      <table>
+        <thead class="text-success">
+          <th style="font-size: 20px; padding-bottom: 10px;">Invoice Details:</th>
+        </thead>
+        <tbody style="font-size: 14px;">
+          <tr>
+            <td><strong>Invoice Period:</strong></td>
+            <td>{{ invoice.from_date.strftime('%d-%b-%y') }} to {{ invoice.to_date.strftime('%d-%b-%y') }}</td>
+          </tr>
+          <tr>
+            <td><strong>Invoice No:</strong></td>
+            <td>SM/INV/{{ invoice.to_date.strftime('%m-%y') }}/#{{ invoice.id }}</td>
+          </tr>
+          <tr>
+            <td><strong>Invoice Date:</strong></td>
+            <td>{{ invoice.invoice_date.strftime('%d-%b-%Y') }}</td>
+          </tr>
+          <tr>
+            <td><strong>Invoice Due Date:</strong></td>
+            <td>{{ invoice.to_date.strftime('%d-%b-%Y') }}</td>
+          </tr>
+          <tr>
+            <td><strong>Payment Mode:</strong></td>
+            <td>{{ invoice.payment_mode or '-'}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <hr style="margin: 20px 0; margin-bottom: 60px;">
+
+    <!-- Subject Table -->
+    <div class="d-flex justify-content-between mb-2">
+      <h5 class="fw-bold text-success mb-3">📚 Subjects & Fees details:</h5>
+      <h5>
+        Invoice Status:
+        {% if invoice.status == 'paid' %}
+          <span class="text-success">{{ invoice.status.upper() }}</span>
+        {% else %}
+          <span class="text-danger">{{ invoice.status.upper() }}</span>
+        {% endif %}
+      </h5>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead class="table-success">
+          <tr>
+            <th>📘 Subject</th>
+            <th>✅ Fee Received Till</th>
+            <th class="text-end">💸 Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for subject, data in invoice.subjects.items() %}
+          <tr>
+            <td>{{ subject }}</td>
+            <td>{{ data.received_till | str_to_date | format_date('%d-%b-%y') or '-' }}</td>
+            <td class="text-end">₹ {{ data.fee }}</td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td colspan="2" class="text-end"><strong>Grand Total</strong></td>
+            <td class="text-end"><strong>₹ {{ invoice.amount }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr style="margin-top: 50px;">
+    <div class="d-flex justify-content-between">
+        <p><strong>💰 Total Amount:</strong> ₹ {{ invoice.amount }}</p>
+        <p><strong>🟢 Paid:</strong> ₹ {{ invoice.amount_received or 0 }}</p>
+        <p><strong>🔴 Pending:</strong> ₹ {{ invoice.pending or invoice.amount - (invoice.amount_received or 0) }}</p>
+    </div>
+    <hr style="margin-top: 10px; margin-bottom: 40px;">
+
+    <!-- Thank You / Reminder -->
+    <p class="text-center mt-4">
+      <strong>
+        {% if invoice.status == 'paid' %}
+          <span class="text-success">Thank you for your payment!</span>
+        {% else %}
+          <span class="text-danger">Please pay your balance before due date!</span>
+        {% endif %}
+      </strong>
+    </p>
+    
+    <!-- Section: Transactions -->
+    <h4 class="fw-bold text-success mb-3 mt-5">💸 Payment History</h4>
+    <div class="bg-white border rounded-4 shadow-sm p-4 mb-4">
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-success">
+            <tr>
+              <th>#</th>
+              <th>Invoice Period</th>
+              <th>Received On</th>
+              <th>Amount Received</th>
+              <th>Payment Mode</th>
+              <th>Payment Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for transaction, invoice in all_transactions %}
+              {% if transaction %}
+              <tr>
+                <td>{{ invoice.id }}</td>
+                <td>{{ invoice.from_date.strftime('%d-%b-%y') }} to {{ invoice.to_date.strftime('%d-%b-%y') }}</td>
+                <td>{{ invoice.fee_received_on.strftime('%d-%b-%y') if invoice.fee_received_on else '-' }}</td>
+                <td>₹{{ transaction.amount }}</td>
+                <td>{{ transaction.payment_mode or '-' }}</td>
+                <td>{{ transaction.payment_note or '-' }}</td>
+              </tr>
+              {% endif %}
+            {% else %}
+              <tr><td colspan="6" class="text-center">No transactions available.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

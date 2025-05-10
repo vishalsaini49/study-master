@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Login - Study Master{% endblock %}
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="page-head gr-bg-white">
+      <div class="fancy-heading">🔐 Login to Study Master</div>
+    </div>
+    <div class="form-section inner-form">
+      {% if error %}
+        <div class="alert alert-danger text-center">{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" name="username" required autocomplete="username" placeholder="Please enter your username">
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" name="password" required autocomplete="current-password" placeholder="Please enter your password">
+        </div>
+
+        <button type="submit" class="btn-gradient btn-green w-100">Login</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

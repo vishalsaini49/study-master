@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Update Profile - Study Master{% endblock %}
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="page-head gr-bg-white">
+      <div class="fancy-heading"><i class="bi bi-person-gear fancy-heading"></i> Update Profile Details</div>
+      <div class="d-flex gap-3">
+        <a href="{{ url_for('show_users') }}" class="btn-gradient btn-red" title="Close">×</a>
+      </div>
+    </div>
+    <!-- Current Details -->
+    <div class="bg-white border rounded-4 shadow-sm p-4 mb-4">
+      <h5 class="fw-bold text-success mb-3">👤 Your Current Profile Details</h5><hr class="my-3 text-success">
+      <div class="table-responsive mb-5">
+        <table class="table table-borderless align-middle">
+          <tbody class="text-danger">
+            <tr>
+              <td><b>Name</b></td>
+              <td>{{ user.name }}</td>
+            </tr>
+            <tr>
+              <td><b>Username</b></td>
+              <td>{{ user.username }}</td>
+            </tr>
+            <tr>
+              <td><b>Mobile</b></td>
+              <td>{{ user.mobile }}</td>
+            </tr>
+            <tr>
+              <td><b>Role</b></td>
+              <td>{{ user.role.capitalize() }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Checkboxes -->
+      <h5 class="fw-bold text-success mb-3">☑️ What would you like to update?</h5><hr class="my-3 text-success">
+      <div class="d-flex justify-content-between flex-wrap gap-3 mb-5">
+        {% for field in ['Name', 'Username', 'Password', 'Mobile'] %}
+        <div class="form-check form-check-inline text-dark">
+          <input class="form-check-input toggle-input" type="checkbox" id="change{{ field }}" value="{{ field|lower }}">
+          <label class="form-check-label fw-bold" for="change{{ field }}">{{ field }}</label>
+        </div>
+        {% endfor %}
+
+        {% if session['role'] in ['admin', 'developer'] %}
+        <div class="form-check form-check-inline text-dark">
+          <input class="form-check-input toggle-input" type="checkbox" id="changeRole" value="role">
+          <label class="form-check-label fw-bold" for="changeRole">Role</label>
+        </div>
+        {% endif %}
+      </div>
+
+      <h5 class="fw-bold text-success mb-3">🔐 Update Profile Details</h5><hr class="my-3 text-success">
+      <form method="POST" class="form-section">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <!-- Input Fields for Name, Username, Password, Mobile -->
+        <div class="table-responsive">
+          <table class="table table-borderless align-middle">
+            <tbody>
+              {% for field in ['name', 'username', 'password', 'mobile'] %}
+              <tr class="d-none" id="{{ field }}Field">
+                <td><label for="{{ field }}" class="form-label fw-bold">New {{ field | capitalize }}</label></td>
+                <td>
+                  <input type="{{ 'password' if field == 'password' else 'text' }}" class="form-control"
+                    id="{{ field }}" name="{{ field }}" placeholder="Enter new {{ field }}">
+                </td>
+              </tr>
+              {% endfor %}
+
+              {% if session['role'] in ['admin', 'developer'] %}
+              <tr class="d-none" id="roleField">
+                <td><label for="role" class="form-label fw-bold">Select Role</label></td>
+                <td>
+                  <select class="form-select" id="role" name="role">
+                    <option value="">-- Choose Role --</option>
+                    <option value="admin">Admin</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="developer">Developer</option>
+                  </select>
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+        <!-- Buttons -->
+        <div class="d-flex justify-content-center mt-5">
+          <button type="submit" class="btn-gradient btn-blue px-5 me-2">Update</button>
+          <button type="button" class="btn-gradient btn-red px-5 py-2" onclick="window.history.back()">⮪
+            Back</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

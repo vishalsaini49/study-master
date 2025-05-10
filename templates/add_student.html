@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}Add Student - Study Master{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="page-head gr-bg-white">
+    <div class="fancy-heading"><i class="bi bi-person-add fancy-heading"></i> Add New Student</div>
+    <div class="d-flex gap-3">
+      <button type="button" class="btn-gradient btn-red me-2" onclick="window.history.back()" title="close">x</button>
+    </div>
+  </div>
+  <div class="col-lg-12 py-4 text-white inner-form p-4">
+    <div class="form-section mt-3">
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <!-- 🔹 Personal Details -->
+        <div class="mb-5">
+          <hr class="my-3"><h3 class="mb-3">👤 Personal Details</h3><hr class="my-3">
+          <!-- Group 1: Name & Class -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">🧑 Name *</label>
+              <input type="text" class="form-control" name="name" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">🎓 Class *</label>
+              <select class="form-select" name="class_name" required>
+                <option disabled selected>Select Class</option>
+                {% for cls in ['6th','7th','8th','9th','10th','11th','12th'] %}
+                <option value="{{ cls }}">{{ cls }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- Group 2: Mobile & Alternate -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">📱 Mobile *</label>
+              <input type="text" class="form-control" name="mobile" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">📞 Alternate Phone</label>
+              <input type="text" class="form-control" name="alternate_phone">
+            </div>
+          </div>
+
+          <!-- Group 3: Email & School -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">📧 Email</label>
+              <input type="email" class="form-control" name="email">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">🏠 School</label>
+              <input type="text" class="form-control" name="school">
+            </div>
+          </div>
+
+          <!-- Group 4: Joining & Payment -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">📅 Joining Date *</label>
+              <input type="date" class="form-control" name="joining_date" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">💳 Payment Type *</label>
+              <select class="form-select" name="payment_type" required>
+                <option>Monthly</option>
+                <option selected>Yearly</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🔹 Subject Selection -->
+        <div class="mb-5">
+          <hr class="my-3"><h3 class="mb-3">📘 Select Subjects *</h3><hr class="my-3">
+          <div class="row" id="subjectsCheckboxes">
+            {% for subject in ['All subjects','English','Mathematics','Accountancy','Economics','Business Studies','Science','Social Studies'] %}
+            <div class="col-md-4 mb-2">
+              <div class="form-check">
+                <input class="form-check-input subject-checkbox" type="checkbox" name="subjects" value="{{ subject }}" id="sub_{{ loop.index }}">
+                <label class="form-check-label" for="sub_{{ loop.index }}">{{ subject }}</label>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <!-- 🔹 Subjects & Fees -->
+        <div class="mb-5">
+          <hr class="my-3"><h3 class="mb-3">📚 Subjects & Fees</h3><hr class="my-3">
+          <div class="table-responsive bg-light rounded-4 shadow-sm">
+            <table class="table rounded-4 table-borderless" id="feesTable">
+              <thead class="table-success">
+                <tr>
+                  <th>📘 Subject</th>
+                  <th>🧾 Fee (₹)</th>
+                  <th>📆 Start Date</th>
+                </tr>
+              </thead>
+              <tbody id="feesContainer" class="table-light">
+                <!-- Dynamic rows will appear here -->
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-2 text-end p-2">
+            <h3 class="text-outline text-outline-white" style="color: brown;">
+              <strong>Total Fee: ₹<span id="totalFees">0</span></strong></h3>
+          </div>
+        </div>
+        <!-- Notes -->
+        <div class="mb-3 mt-4">
+          <hr class="my-3"><h3 class="mb-3"><span class="material-symbols-outlined bi">note_alt</span> Additional Notes</h3><hr class="my-3">
+          <textarea class="form-control" name="notes" rows="3"></textarea>
+        </div>
+
+        <!-- Submit -->
+        <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+          <button type="submit" class="btn-gradient btn-green px-4 py-2 w-50"><span class="material-symbols-outlined">save_as</span> Save Student Data</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

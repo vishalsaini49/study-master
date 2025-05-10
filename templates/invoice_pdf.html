@@ -1,0 +1,198 @@
+{% block content %}
+<div style="max-width: 800px; margin: auto; font-family: Arial, sans-serif; font-size: 14px; color: #333; border: 1px solid #ccc; padding: 30px;">
+  <!-- Table for logo and center info -->
+  <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin-bottom: 20px;">
+    <tr>
+      <!-- Left image -->
+      <td style="width: 220px; text-align: left;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Left Logo" style="max-width: 200px; height: auto;">
+      </td>
+  
+      <!-- Middle content -->
+      <td style="text-align: center;">
+        <h1 style="margin: 0;">Study Master</h1>
+        <p style="margin: 0;">Naharpur Village, Sector 7,</p>
+        <p style="margin: 0;">Rohini, Delhi-110085</p>
+        <p style="margin: 0;">Contact No: 9818401912</p>
+      </td>
+  
+      <!-- Right image -->
+      <td style="width: 220px; text-align: right;">
+        <p style="text-align: right; margin-bottom: 4px;">Scan to Pay</p>
+        <img src="{{ url_for('static', filename='images/qrcode.jpg') }}" alt="Right Logo" style="max-width: 140px; height: auto;">
+      </td>
+    </tr>
+  </table>
+
+  <h2 style="color: #0d6efd; margin-bottom: 40px; text-align: center; font-size: 36px;">Invoice</h2>
+  <hr style="margin: 20px 0;">
+
+
+  <table style="width: 100%; table-layout: fixed; margin-bottom: 20px;">
+    <tr>
+      <!-- Student Details -->
+      <td style="width: 50%; vertical-align: top; padding-right: 10px;">
+        <table style="width: 100%; font-size: 14px;">
+          <thead>
+            <th colspan="2" style="font-size: 20px; padding-bottom: 10px; text-align: left;">Student Details:</th>
+          </thead>
+          <tbody style="font-size: 14px;">
+            <tr>
+              <td style="width: 30%;"><strong>Name:</strong></td>
+              <td>{{ student.name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Class:</strong></td>
+              <td>{{ student.class_name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Contact:</strong></td>
+              <td>+91-{{ student.mobile }}</td>
+            </tr>
+            <tr>
+              <td><strong>Email:</strong></td>
+              <td>{{ student.email }}</td>
+            </tr>
+            <tr>
+              <td><strong>School:</strong></td>
+              <td>{{ student.school }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+
+      <!-- Invoice Details -->
+      <td style="width: 50%; vertical-align: top; padding-left: 10px;">
+        <table style="width: 100%; font-size: 14px;">
+          <thead>
+            <th colspan="2" style="font-size: 20px; padding-bottom: 10px; text-align: left;">Invoice Details:</th>
+          </thead>
+          <tbody style="font-size: 14px;">
+            <tr>
+              <td><strong>Invoice Period:</strong></td>
+              <td>{{ invoice.from_date.strftime('%d-%b-%y') }} to {{ invoice.to_date.strftime('%d-%b-%y') }}</td>
+            </tr>
+            <tr>
+              <td><strong>Invoice No:</strong></td>
+              <td>SM/INV/{{ invoice.to_date.strftime('%m-%y') }}/#{{ invoice.id }}</td>
+            </tr>
+            <tr>
+              <td><strong>Invoice Date:</strong></td>
+              <td>{{ invoice.invoice_date.strftime('%d-%b-%Y') }}</td>
+            </tr>
+            <tr>
+              <td><strong>Invoice Due Date:</strong></td>
+              <td>{{ invoice.to_date.strftime('%d-%b-%Y') }}</td>
+            </tr>
+            <tr>
+              <td><strong>Payment Mode:</strong></td>
+              <td>{{ invoice.payment_mode or '-'}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </table>
+  
+  <hr style="margin: 20px 0; margin-bottom: 60px;">
+  <table style="width: 100%; margin-bottom: 20px;">
+    <tr>
+      <td style="font-size: 20px;">
+        <strong>Subjects & Fees details:</strong>
+      </td>
+      <td style="text-align: right;"><strong>Invoice Status:</strong><strong>
+        {% if invoice.status == 'paid' %}
+        <span style="color: green;">{{ invoice.status.upper() }}</span>
+        {% else %}
+        <span style="color: red;">{{ invoice.status.upper() }}</span>
+        {% endif %}</strong>
+      </td>
+    </tr>
+  </table>
+
+  <table style="width: 100%; border-collapse: collapse;" border="1" cellpadding="8">
+    <thead style="background-color: #f2f2f2;">
+      <tr>
+        <th style="text-align: left;">Subject</th>
+        <th style="text-align: left;">Fee Received Till</th>
+        <th style="text-align: right;">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for subject, data in invoice.subjects.items() %}
+      <tr>
+        <td>{{ subject }}</td>
+        <td>{{ data['received_till'] or '-' }}</td>
+        <td style="text-align: right;">&#8377; {{ data['fee'] }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="2" style="text-align: right;"><strong>Grand Total</strong></td>
+        <td style="text-align: right;"><strong>&#8377; {{ invoice.amount }}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr style="margin-top: 50px;">
+  <table style="width: 100%;">
+    <tbody>
+      <tr>
+        <td style="width: 33.33%; color: #0d6efd;"><strong>Total Amount:</strong> &#8377; {{ invoice.amount }}</td>
+        <td style="width: 33.33%; text-align: center; color: green;"><strong>Paid:</strong> &#8377; {{ invoice.amount_received or 0 }}</td>
+        <td style="width: 33.33%; text-align: right; color: red;"><strong>Pending:</strong> &#8377; {{ invoice.pending or invoice.amount - (invoice.amount_received or 0) }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <hr style="margin-top: 10px; margin-bottom: 40px;">
+
+  <p style="text-align: center; margin-top: 40px; color: #555;">
+    <strong>
+      {% if invoice.status == 'paid' %}
+      <span style="color: green;">Thank you for your payment!</span>
+      {% else %}
+      <span style="color: red;">Please pay your balance before due date!</span>
+      {% endif %}
+    </strong>
+  </p>
+
+
+  <!-- Section: Transactions -->
+  <h3 style="margin-bottom: 16px; margin-top: 60px; color: #333;">Payment History</h3>
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;" border="1" cellpadding="8">
+    <thead style="background-color: #f9f9f9;">
+      <tr>
+        <th>#</th>
+        <th>Invoice Period</th>
+        <th>Received On</th>
+        <th>Amount Received</th>
+        <th>Payment Mode</th>
+        <th>Payment Note</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for transaction, invoice in all_transactions %}
+        {% if transaction %}
+        <tr>
+          <td>{{ invoice.id }}</td>
+          <td>{{ invoice.from_date.strftime('%d-%b-%y') }} to {{ invoice.to_date.strftime('%d-%b-%y') }}</td>
+          <td>{{ invoice.fee_received_on.strftime('%d-%b-%y') if invoice.fee_received_on else '-' }}</td>
+          <td class="{{ 'amount-positive' if transaction.amount > 0 else 'amount-negative' }}">&#8377; {{ transaction.amount }}</td>
+          <td>{{ transaction.payment_mode or '-' }}</td>
+          <td>{{ transaction.payment_note or '-' }}</td>
+        </tr>
+        {% endif %}
+      {% else %}
+        <tr><td colspan="6" style="text-align: center;">No transactions available.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<style>
+.amount-positive {
+  color: green;
+}
+.amount-negative {
+  color: red;
+}
+</style>
+{% endblock %}

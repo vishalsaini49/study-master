@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Edit Student - Study Master{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="page-head gr-bg-white">
+        <div class="fancy-heading"><i class="bi bi-person-gear fancy-heading"></i> Edit Student Details</div>
+        <div class="d-flex gap-3">
+            <button type="button" class="btn-gradient btn-red me-2" onclick="window.history.back()"
+                title="close">x</button>
+        </div>
+    </div>
+    <div class="col-lg-12 py-4 text-white inner-form p-4">
+        <div class="form-section mt-3">
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <!-- 🔹 Personal Details -->
+                <div class="mb-5">
+                    <hr class="my-3">
+                    <h3 class="mb-3">👤 Personal Details</h3>
+                    <hr class="my-3">
+                    <!-- Group 1: Name & Class -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">🧑 Name *</label>
+                            <input type="text" name="name" value="{{ student.name }}" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">🎓 Class *</label>
+                            <select name="class_name" class="form-select" required>
+                                {% for cls in ['6th', '7th', '8th', '9th', '10th', '11th', '12th'] %}
+                                <option value="{{ cls }}" {% if student.class_name==cls %}selected{% endif %}>{{ cls }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Group 2: Mobile & Alternate -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">📱 Mobile *</label>
+                            <input type="text" name="mobile" maxlength="10" value="{{ student.mobile }}" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">📞 Alternate Phone</label>
+                            <input type="text" name="alternate_phone" maxlength="10" value="{{ student.alternate_phone or '' }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- Group 3: Email & School -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">📧 Email</label>
+                            <input type="email" name="email" value="{{ student.email or '' }}" class="form-control">
+
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">🏠 School</label>
+                            <input type="text" name="school" value="{{ student.school or '' }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- Group 4: Joining & Payment -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">📅 Joining Date *</label>
+                            <input type="date" name="joining_date" value="{{ student.joining_date.strftime('%Y-%m-%d') }}" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">💳 Payment Type *</label>
+                            <select name="payment_type" class="form-select" required>
+                                <option value="Monthly" {% if student.payment_type=='Monthly' %}selected{% endif %}>Monthly</option>
+                                <option value="Yearly" {% if student.payment_type=='Yearly' %}selected{% endif %}>Yearly</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 🔹 Subjects & Fees -->
+                <div class="mb-5">
+                    <hr class="my-3"><h3 class="mb-3">📚 Subjects & Fees</h3><hr class="my-3">
+                    <div class="table-responsive bg-light rounded-4 shadow-sm">
+                        <table class="table rounded-4 table-borderless">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Select</th>
+                                    <th>📘 Subject</th>
+                                    <th>🧾 Fee (₹)</th>
+                                    <th>📆 Start Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set subject_list = ['All subjects','English','Mathematics','Accountancy','Economics','Business Studies','Science','Social Studies'] %}
+                                {% for subject in subject_list %}
+                                {% set subject_data = subjects_fees[subject] if subjects_fees and subjects_fees.get(subject) is mapping else {} %}
+                                <tr data-subject="{{ subject }}">
+                                    <td><input type="checkbox" class="subject-checkbox" name="subjects" value="{{ subject }}" {% if subject in subjects_fees %}checked{% endif %}></td>
+                                    <td>{{ subject }}</td>
+                                    <td><input type="number" name="fee[{{ subject }}]" min="0" value="{{ subject_data.get('fee', '') }}" class="form-control"></td>
+                                    <td><input type="date" name="start[{{ subject }}]" value="{{ subject_data.get('start_date', '') }}" class="form-control"></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-2 text-end p-2">
+                        <h3 class="text-outline text-outline-white" style="color: brown;">
+                            <strong>Total Fee: ₹<span id="totalFee">0</span></strong>
+                        </h3>
+                    </div>
+                </div>
+                <!-- Notes -->
+                <div class="mb-3 mt-4">
+                    <hr class="my-3"><h3 class="mb-3">✍️ Additional Notes</h3><hr class="my-3">
+                    <label class="form-label">Student Notes</label>
+                    <textarea name="notes" class="form-control" rows="3">{{ student.notes or '' }}</textarea>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+                    <button type="submit" class="btn-gradient btn-green w-50">💾 Update Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

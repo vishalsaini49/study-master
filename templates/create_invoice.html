@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit' if editing else 'Create' }} Invoice - Study Master{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="page-head gr-bg-white">
+    <div class="fancy-heading"><strong>🧾 {{ 'Edit' if editing else 'Create' }} Invoice{% if student %} for {{ student.name }}{% endif %}</strong></div>
+    <div class="d-flex gap-3">
+      <button type="button" class="btn-gradient btn-red me-2" onclick="window.history.back()" title="close">x</button>
+    </div>
+  </div>
+  <div class="col-md-12 py-4 text-white inner-form p-4">
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <!-- 🔹 Invoice Dates -->
+      <div class="mb-5">
+        <hr class="my-3"><h3 class="mb-3">📅 Invoice Dates</h3><hr class="my-3">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label class="form-label">🧾 Invoice Date</label>
+            <input type="date" name="invoice_date" class="form-control" value="{{ invoice.invoice_date or invoice_date }}">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">📅 From Date</label>
+            <input type="date" name="from_date" class="form-control" value="{{ invoice.from_date or from_date }}">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">📅 To Date</label>
+            <input type="date" name="to_date" class="form-control" value="{{ invoice.to_date or to_date }}">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">📥 Fee Received On</label>
+            <input type="date" name="fee_received_on" class="form-control" value="{{ invoice.fee_received_on or fee_received_on }}">
+          </div>
+        </div>
+      </div>
+
+      <!-- 🔹 Payment Info -->
+      <div class="mb-5">
+        <hr class="my-3"><h3 class="mb-3">💳 Payment Info</h3><hr class="my-3">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">💳 Payment Mode</label>
+            <select name="payment_mode" class="form-select" required>
+              <option value="">Select</option>
+              <option value="cash" {% if editing and invoice.payment_mode == 'cash' %}selected{% endif %}>Cash</option>
+              <option value="online" {% if editing and invoice.payment_mode == 'online' %}selected{% endif %}>Online</option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">💰 Advance Payment</label>
+            <select name="advance_payment" class="form-select" required>
+              <option value="">Select</option>
+              <option value="yes" {% if editing and invoice.advance_payment == 'yes' %}selected{% endif %}>Yes</option>
+              <option value="no" {% if editing and invoice.advance_payment == 'no' %}selected{% endif %}>No</option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">📝 Payment Note</label>
+            <input type="text" name="payment_note" class="form-control" value="{% if editing %}{{ invoice.payment_note or '' }}{% else %}{% endif %}">
+          </div>
+        </div>
+      </div>
+
+      <!-- 🔹 Select Subjects -->
+      <div class="mb-5">
+        <hr class="my-3"><h3 class="mb-3">📘 Select Subjects</h3><hr class="my-3">
+        <div class="row" id="subjectsCheckboxes">
+          {% for subject, details in student.subjects_fees.items() %}
+          <div class="col-md-4 mb-2">
+            <div class="form-check">
+              <input class="form-check-input subject-checkbox" type="checkbox" name="subjects" value="{{ subject }}" id="sub_{{ loop.index }}"
+                {% if not invoice or (invoice and subject in invoice.subjects) %}checked{% endif %}>
+              <label class="form-check-label" for="sub_{{ loop.index }}">{{ subject }}</label>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- 🔹 Subject Fee Details -->
+      <div class="mb-5">
+        <hr class="my-3"><h3 class="mb-3">📄 Subject Fee Details</h3><hr class="my-3">
+        <div class="table-responsive bg-light rounded-4 shadow-sm">
+          <table class="table rounded-4 table-borderless" id="subjectTable">
+            <thead class="table-success">
+              <tr>
+                <th>📘 Subject</th>
+                <th>🧾 Fee (₹)</th>
+                <th>📆 Start Date</th>
+                <th>📆 Fee Received Till</th>
+              </tr>
+            </thead>
+            <tbody class="table-light">
+              <!-- Dynamic rows will appear here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 🔹 Amount Summary -->
+      <div class="mb-5">
+        <hr class="my-3"><h3 class="mb-3">💵 Amount Summary</h3><hr class="my-3">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">💵 Amount Received</label>
+            <input type="number" step="0.01" name="amount_received" id="amountReceived" class="form-control" value="{{ invoice.amount_received if editing else 0 }}">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">💵 Invoice Amount</label>
+            <input type="number" step="0.01" name="amount" class="form-control" readonly id="invoiceAmount">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">⏳ Pending</label>
+            <input type="number" step="0.01" name="pending" class="form-control" readonly required>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🔹 Invoice Notes -->
+      <div class="mb-4">
+        <hr class="my-3"><h3 class="mb-3">🗒️ Invoice Notes</h3><hr class="my-3">
+        <textarea name="invoice_note" class="form-control" rows="2">{{ invoice.invoice_note or '' }}</textarea>
+      </div>
+
+      <!-- 🔹 Submit -->
+      <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+        <button type="submit" class="btn-gradient btn-green px-4 py-2">✅ {{ 'Update' if editing else 'Generate' }} Invoice</button>
+        {% if source == 'student' %}
+        <a href="{{ url_for('view_student', student_id=student.id) }}" class="btn-gradient btn-blue">⬅ Back to Student View</a>
+        {% elif source == 'dashboard' %}
+        <a href="{{ url_for('dashboard') }}" class="btn-gradient btn-blue">⬅ Back to Dashboard</a>
+        {% else %}
+        <a href="{{ url_for('invoices') }}" class="btn-gradient btn-blue">⬅ Back to Invoices</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Data for JS -->
+<div id="invoice-data"
+     data-student-subjects='{{ student.subjects_fees | default({}) | tojson | safe }}'
+     data-invoice-subjects='{{ invoice.subjects | default({}) | tojson | safe }}'></div>
+{% endblock %}

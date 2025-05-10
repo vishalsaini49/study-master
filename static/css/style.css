@@ -1,0 +1,276 @@
+body {background: #0f172a; font-family: 'Nunito', sans-serif; color: white; margin: 0; padding: 2rem;}
+h1 {text-align: center; margin-bottom: 2rem;}
+a {text-decoration: none;}
+
+.dropdown-menu {background-color: white !important; color: #000;}
+.dropdown-item:hover {background-color: #f8f9fa;}
+
+.emoji {font-size: 3.5rem; margin-bottom: 0.5rem;}
+.emoji > .bi {font-size: 3.2rem; margin-bottom: 0.5rem;}
+
+.bi {font-size: 1.5rem;}
+
+/* Popup for student Deletion */
+#confirmModal input:focus {border-color: #2563eb; outline: none; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4);}
+
+/* Page Heading */
+.page-head {
+  border-radius: 16px;
+  padding: 1.5rem 1rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: all 0.5s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-left: 6px solid #0d6efd; /* Blue accent */
+}
+.fancy-heading {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 3rem;
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(13, 110, 253, 0.3);
+  color: white;
+  text-shadow: 
+   -1.5px -1.5px 0 #000,
+    1.5px -1.5px 0 #000,
+   -1.5px  1.5px 0 #000,
+    1.5px  1.5px 0 #000;
+}
+.inner-form {
+  background-color: #003366;
+  background-image: linear-gradient(315deg, #003366 0%, #242124 74%);
+  /* background: linear-gradient(to left, #330867, #30cfd0, #330867); */
+  border-radius: 16px;
+  padding: 3rem 1.5rem;
+  color: white;
+  font-size: 1.2rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: all 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+}
+.inner-form:hover {transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);}
+
+/* Highlight selected student */
+.student-item.selected {color: #fff !important; background-color: #484d52 !important; font-weight: bold; outline: 2px solid #1db30f;}
+
+/* Button Size */
+.btn-lg {padding: 14px 28px; font-size: 1.25rem; border-radius: 14px;}
+/* Gradient Button */
+.btn-gradient {
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.btn-gradient:hover {transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);}
+
+/* Button Gradient Colors */
+.btn-orange {background: linear-gradient(to right, #f6d365, #fda085);}
+.btn-orange:hover {background: linear-gradient(to right, #ff512f, #f09819); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);}
+
+.btn-green {background: linear-gradient(to right, #56ab2f, #a8e063);}
+.btn-green:hover {background: linear-gradient(to right, #52c234, #061700); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);}
+
+.btn-gray {background: linear-gradient(to right, #6a85b6, #bac8e0);}
+.btn-gray:hover {background: linear-gradient(to right, #485563, #29323c); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);}
+
+.btn-red {background: linear-gradient(to right, #ff512f, #f09819);}
+.btn-red:hover {background: linear-gradient(to right, #ed213a, #93291e); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);}
+
+.btn-blue {background: linear-gradient(to right, #1fa2ff, #12d8fa);}
+.btn-blue:hover {background: linear-gradient(to right, #0575e6, #021b79); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);}
+
+/* Gradient Colors */
+.gr-bg-green {background: linear-gradient(to right, #56ab2f, #a8e063);}
+.gr-bg-green-h {background: linear-gradient(to right, #52c234, #061700);}
+
+.gr-bg-gray {background: linear-gradient(to right, #6a85b6, #bac8e0);}
+.gr-bg-gray-h {background: linear-gradient(to right, #485563, #29323c);}
+
+.gr-bg-red {background: linear-gradient(to right, #ff512f, #f09819);}
+.gr-bg-red-h {background: linear-gradient(to right, #ed213a, #93291e);}
+
+.gr-bg-blue {background: linear-gradient(to right, #1fa2ff, #12d8fa, #a6ffcb);}
+.gr-bg-blue-h {background: linear-gradient(to right, #0575e6, #021b79);}
+
+.gr-bg-orange {background: linear-gradient(to right, #f6d365, #fda085);}
+.gr-bg-white {background: linear-gradient(to right, #e3f2fd, #f1f8ff); /* Light blue gradient */}
+
+/* Table Custom Header */
+.custom-header {background: #29323c !important; color: white !important;}
+.custom-header th {background: #29323c !important; color: white !important;}
+
+/* Student Checkbox */
+.student-checkbox {transform: scale(1.2); cursor: pointer;}
+
+/* Amount Pending Field */
+.pending-green {color: green;}
+.pending-red {color: red;}
+
+/* Text Outline */
+.text-outline {text-shadow: -1px -1px 0 var(--outline-color), 1px -1px 0 var(--outline-color), -1px  1px 0 var(--outline-color), 1px  1px 0 var(--outline-color);}
+
+/* Specific outline color modifiers */
+.text-outline-black { --outline-color: #000; }
+.text-outline-white { --outline-color: #fff; }
+.text-outline-green { --outline-color: #1db30f; }
+.text-outline-red   { --outline-color: #eb1919; }
+.text-outline-blue  { --outline-color: #2563eb; }
+
+
+/* Card Styles */
+.grid {display: grid; gap: 1.5rem; grid-template-columns: 1fr;  /* Mobile default: 1 per row */}
+.card-summary {border-radius: 1rem; background: #f8f9fa; transition: transform 0.2s ease-in-out;}
+.card-summary:hover {transform: scale(1.02);}
+.card {
+  background: linear-gradient(to right, #30cfd0, #330867);
+  border-radius: 16px;
+  padding: 3rem 1.5rem;
+  color: white;
+  font-size: 1.5rem;
+  font-family: 'Nunito', sans-serif;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: all 0.5s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  text-align: center;
+}
+.card:hover {background: linear-gradient(to right, #f6d365, #fda085); transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);}
+.card-head {font-size: 1.7rem; font-family: 'Nunito', sans-serif; font-weight: 700;}
+
+@media (min-width: 768px) {.grid {grid-template-columns: repeat(2, 1fr);    /* Tablet: 2 per row */  }}
+@media (min-width: 1024px) {.grid {grid-template-columns: repeat(3, 1fr);    /* Desktop: 3 per row max */  }}
+
+/* Toggle status slider */
+.switch {position: relative; display: inline-block; width: 50px; height: 24px;}
+.switch input {opacity: 0; width: 0; height: 0;}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: red;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+input:checked + .slider {background-color: green;}
+input:checked + .slider:before {transform: translateX(26px);}
+
+
+/* Student Search Box */
+.search-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4%;
+  background-color: transparent; /* Make the container transparent */
+}
+
+.search-text {
+  margin-right: 5%;
+  color: rgb(25, 135, 84); /* Green text */
+  font-size: 32px;
+}
+.input-wrapper {
+  flex-grow: 1;
+  border-bottom: 2px solid #fff; /* White bottom border for the input area */
+  display: flex;
+  align-items: center;
+  padding-bottom: 5px; /* Adjust padding to align with text */
+  border-radius: 10px;
+}
+
+.search-input {
+  flex-grow: 1;
+  border: none;
+  border-bottom: 2px solid #a7a5a5; /* or your preferred color */
+  outline: none;
+  padding: 5px 0;
+  font-size: 24px;
+  background-color: transparent; /* Make the input transparent */
+  background: transparent;
+  color: #000000; /* Black input text */
+}
+
+.search-input::placeholder {
+  color: #a7a5a5; /* Light gray placeholder text */
+}
+
+.clear-button {
+  background: none;
+  border: none;
+  color: #000; /* black 'x' */
+  cursor: pointer;
+  font-size: 24px;
+  padding: 0;
+  margin-left: 10px;
+  margin-right: 2%;
+}
+.clear-button:hover {color: red; cursor: pointer;}
+.search-input:focus {border: none;}
+
+/* Fancy UI on focus */
+.input-wrapper:focus-within {
+  border-bottom-color: #007bff; /* Highlight color on focus */
+  box-shadow: 0 2px 5px rgba(2, 63, 129, 0.6); /* Subtle shadow */
+}
+
+.search-container:focus-within {
+  color: #007bff;
+}
+
+.material-symbols-outlined {
+  vertical-align: middle;
+}
+
+.icon-gradient {
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.icon-gradient:disabled {
+  opacity: 0.7;               /* Make it look dimmed */
+  cursor: not-allowed;        /* Change cursor to indicate it's disabled */
+  transform: none !important; /* Prevent hover animation */
+  box-shadow: none !important;
+}
+
+.icon-gradient:hover {transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);}
+
+.act-btn {
+  padding: 4px 8px !important;
+}

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Study Master{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  {% block head %}{% endblock %}
+</head>
+
+<body>
+{% if not hide_navbar %}
+<div class="d-flex justify-content-between align-items-center px-4 py-3 text-white" style="background-color: transparent;">
+  <div class="fs-4"><h2>Welcome, 👋 <strong>{{ session['name'] }}</strong></h2></div>
+
+  <div class="dropdown">
+    <a href="{{ url_for('dashboard') }}" class="text-white fs-4 me-3 align-middle"><i class="bi bi-house-gear-fill"></i> Dashboard</a>
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      {{ session['name'] }}
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+      <li><a class="dropdown-item" href="{{ url_for('update_profile') }}"><i class="fa-solid fa-user-pen"></i> Update Profile</a></li>
+      <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+    </ul>
+  </div>
+</div>  
+{% endif %}
+
+<!-- Student Search Modal -->
+<div class="modal fade" id="studentSearchModal" tabindex="-1" aria-labelledby="studentSearchLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header gr-bg-gray-h">
+        <h3 class="modal-title" id="studentSearchLabel">Search and Select Student</h3>
+        <button type="button" class="btn-gradient btn-red" data-bs-dismiss="modal" aria-label="Close"><span style="font-size: 1.2rem;">x</span></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="text" class="form-control mb-3" id="studentsInvoice" placeholder="Search student name...">
+        <table class="table table-hover" id="tableInvoice">
+
+          <thead class="table-success">
+            <tr>
+              <th>Name</th>
+              <th>Class</th>
+              <th>Mobile</th>
+              <th>Subjects</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+            <tr class="student-item" data-id="{{ student.id }}"
+                data-name="{{ student.name | lower }}"
+                data-class="{{ student.class_name | lower }}"
+                data-mobile="{{ student.mobile | lower }}"
+                data-subjects="{{ ','.join(student.subjects_fees.keys() | map('lower') | map('trim')) }}"
+                style="cursor:pointer;">
+              <td>{{ student.name }}</td>
+              <td>{{ student.class_name }}</td>
+              <td>{{ student.mobile }}</td>
+              <td>{{ ', '.join(student.subjects_fees) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-gradient btn-green" id="confirmSelection" disabled>Select Student</button>
+        <a id="backButton" class="btn-gradient btn-red">⮪ Back</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Universal Confirmation Popup Modal -->
+<div id="confirmModal" class="modal d-none position-fixed top-0 left-0 w-100 h-100 d-flex align-items-center justify-content-center form-section" style="background: rgba(0,0,0,0.5); z-index: 9999;">
+  <div class="p-4 rounded" style="min-width: 320px; background: #310303 !important;">
+    <h4 class="text-danger mb-3 text-center">⚠️ Warning</h4>
+    <p>You are about to delete <strong><span id="selectedCount" class="d-none"></span><span id="entityName" class="d-none"></span><span id="entityType">item(s)</span></strong>.</p>
+    <p>If you want to confirm, type <strong>DELETE</strong> in the box below, or press Cancel to go back.</p>
+    <form id="deleteForm" method="POST" action="{{ url_for('delete_entity') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <!-- Hidden fields to hold the entity type and IDs -->
+      <input type="hidden" name="entity_type" id="entityTypeInput">
+      <input type="hidden" name="entity_ids" id="entityIdsInput">
+      <input type="text" id="deleteConfirmInput" class="form-control mb-3 mt-2" placeholder="Type DELETE">
+      <div class="d-flex justify-content-center gap-5">
+        <button type="submit" class="btn-gradient gr-bg-red-h" id="deleteButton" disabled>Delete Selected Student(s)</button>
+        <button type="button" class="btn-gradient gr-bg-blue-h" onclick="closeModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<div class="container mt-4">
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-info">{{ message }}</div>
+  {% endfor %}
+  
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}
+
+</body>
+</html>

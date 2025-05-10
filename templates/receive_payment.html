@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+{% block title %}Receive Payments  - Study Master{% endblock %}
+{% block content %}
+
+<div class="row justify-content-center col-md-12">
+  <div class="page-head gr-bg-white">
+    <div class="fancy-heading"><i class="bi bi-person fancy-heading"></i> Receive Payment</div>
+    <div class="d-flex gap-3">
+      <a href="{{ url_for('dashboard') }}" class="btn-gradient btn-red" title="Close">×</a>
+    </div>
+  </div>
+
+  <!-- Current Details -->
+  <div class="bg-white border rounded-4 shadow-sm p-4 mb-4">
+    <h5 class="text-success mb-3"><i class="bi bi-person-fill"></i> Current Details of {{ student.name }}</h5>
+    <hr class="my-3 text-success">
+    <div class="table-responsive">
+      <table class="table table-borderless align-middle">
+        <tbody class="text-danger">
+          <tr><td><b>Name</b></td><td>{{ student.name }}</td></tr>
+          <tr><td><b>Mobile</b></td><td>+91-{{ student.mobile }}</td></tr>
+          <tr><td><b>Class</b></td><td>{{ student.class_name }}</td></tr>
+          <tr><td><b>Joining Date</b></td><td>{{ student.joining_date.strftime('%d-%m-%Y') }}</td></tr>
+          <tr><td><b>Payment Type</b></td><td>{{ student.payment_type }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Available Invoices -->
+  {% if invoices %}
+  <div class="bg-white border rounded-4 shadow-sm p-4 mb-4">
+    <div class="d-flex justify-content-between mb-4">
+      <h4 class="text-success fw-bold">🧾 All Invoices</h4>
+      <a href="{{ url_for('create_invoice', student_id=student.id) }}" class="btn-gradient gr-bg-blue-h">🧾 Create New Invoice</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead class="table-success">
+          <tr style="vertical-align: middle;">
+            <th rowspan="2">#</th>
+            <th rowspan="2">📆 Inv. Date</th>
+            <th rowspan="2">📅 Inv. Period</th>
+            <th colspan="2" class="text-center">📚 Subjects</th>
+            <th rowspan="2">📅 Due Date</th>
+            <th rowspan="2">💰 Total</th>
+            <th rowspan="2">💰 Received</th>
+            <th rowspan="2">⚠️ Pending</th>
+            <th rowspan="2">📬 Status</th>
+          </tr>
+          <tr>
+            <th><small><strong>Subject</strong></small></th>
+            <th class="text-center"><small><strong>Fee (₹)</strong></small></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for invoice in invoices %}
+          <tr>
+            <td>{{ invoice.id }}</td>
+            <td>{{ invoice.invoice_date.strftime('%d-%b-%Y') }}</td>
+            <td class="text-center"><div>{{ invoice.from_date.strftime('%d-%b-%y') }}</div><div>to</div><div>{{ invoice.to_date.strftime('%d-%b-%y') }}</div></td>
+            <td colspan="2">
+              {% for subject, details in invoice.subjects.items() %}
+              <table class="table table-borderless table-sm mb-0" style="width: 100%;">
+                <tr>
+                  <td style="width: 75%;"><small><strong>{{ subject }}</strong></small></td>
+                  <td style="width: 25%;"><small>₹{{ details.fee }}</small></td>
+                </tr>
+              </table>
+              {% endfor %}
+            </td>
+            <td>{{ invoice.to_date.strftime('%d-%b-%Y') }}</td>
+            <td>₹{{ invoice.amount }}</td>
+            <td>₹{{ invoice.amount_received }}</td>
+            <td>₹{{ invoice.pending }}</td>
+            <td>
+              {% if invoice.status == 'paid' %}
+                <span class="text-success fw-bold">Paid</span>
+              {% else %}
+                <span class="text-danger fw-bold">Unpaid</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info mt-4">No invoices found.</div>
+    {% endif %}
+  </div>
+
+  <!-- Section: Unpaid Invoices -->
+  <div class="bg-white border rounded-4 shadow-sm p-4 mb-5">
+    <h4 class="fw-bold text-success mb-3"> 🧾 Unpaid Invoices</h4>
+    <div class="bg-white border rounded-4 shadow-sm p-4 mb-5">
+      {% if unpaid_invoices %}
+      <h5 class="text-success mb-3">🧾 Select Invoices to receive payment</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle" id="invoicesTable">
+          <thead class="table-success">
+            <tr>
+              <th>✅</th>
+              <th>#</th>
+              <th>Invoice Period</th>
+              <th>Received</th>
+              <th>Total</th>
+              <th>Pending</th>
+              <th>Status</th>
+              <th>Mode</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for invoice in unpaid_invoices %}
+              <tr>
+                <td><input type="checkbox" class="invoice-selector" data-id="{{ invoice.id }}"
+                  data-period="{{ invoice.from_date.strftime('%d-%b-%y') }} to {{ invoice.to_date.strftime('%d-%b-%y') }}"
+                  data-total="{{ invoice.amount }}"
+                  data-pending="{{ invoice.pending or invoice.amount }}"
+                  data-status="{{ invoice.status }}"
+                  data-note="{{ invoice.payment_note or '' }}"></td>
+                <td>{{ invoice.id }}</td>
+                <td>{{ invoice.from_date.strftime('%d-%b-%y') }} to {{ invoice.to_date.strftime('%d-%b-%y') }}</td>
+                <td>₹{{ invoice.amount_received or 0 }}</td>
+                <td>₹{{ invoice.amount }}</td>
+                <td>₹{{ invoice.pending or invoice.amount - (invoice.amount_received or 0) }}</td>
+                <td>
+                  {% if invoice.status == 'paid' %}
+                    <span class="text-success fw-bold">Paid</span>
+                  {% else %}
+                    <span class="text-danger fw-bold">Unpaid</span>
+                  {% endif %}
+                </td>
+                <td>{{ invoice.payment_mode or '-' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info mt-4">Hurray! No unpaid invoices found.</div>
+      {% endif %}
+    </div>
+
+    <!-- Selected Invoices With Editable Fields -->
+    <h4 class="fw-bold text-success mb-3"> 🧾 Receive Payment for Invoices</h4>
+    <form method="POST" action="{{ url_for('receive_payment', student_id=student.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="bg-white border rounded-4 shadow-sm p-4 mb-4">
+        <h5 class="text-success mb-3">✍️ Payment Details for Selected Invoices</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle" id="selectedInvoicesTable">
+            <thead class="table-success">
+              <tr>
+                <th>#</th>
+                <th>Invoice Period</th>
+                <th>Received on</th>
+                <th>Total (₹)</th>
+                <th>Pending (₹)</th>
+                <th>Received (₹)</th>
+                <th>Payment Mode</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Rows added dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <button type="submit" class="btn-gradient gr-bg-green-h">💾 Receive Payment(s)</button>
+    </form>
+  </div>
+
+  <!-- Section: Transactions -->
+  <div class="bg-white border rounded-4 shadow-sm p-4 mb-4">
+    <h4 class="fw-bold text-success mb-3">💸 Previous Transactions</h4>
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-success">
+            <tr>
+              <th>#</th>
+              <th>Invoice Period</th>
+              <th>Received On</th>
+              <th>Amount Received</th>
+              <th>Payment Mode</th>
+              <th>Payment Note</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for transaction, invoice in all_transactions %}
+            <tr id="row-{{ transaction.id }}">
+              <td>{{ invoice.id }}</td>
+              <td>{{ invoice.from_date.strftime('%d-%b-%y') }} to {{ invoice.to_date.strftime('%d-%b-%y') }}</td>
+              <td>
+                <span class="view">{{ transaction.received_on.strftime('%Y-%m-%d') }}</span>
+                <input type="date" class="form-control form-control-sm edit d-none" name="received_on" value="{{ transaction.received_on.strftime('%Y-%m-%d') }}">
+              </td>
+              <td>
+                <span class="view">₹{{ transaction.amount }}</span>
+                <input type="number" step="0.01" class="form-control form-control-sm edit d-none" name="amount" value="{{ transaction.amount }}">
+              </td>
+              <td>
+                <span class="view">{{ transaction.payment_mode or '-' }}</span>
+                <select class="form-select form-select-sm edit d-none" name="payment_mode">
+                  <option value="cash" {% if transaction.payment_mode == 'cash' %}selected{% endif %}>Cash</option>
+                  <option value="online" {% if transaction.payment_mode == 'online' %}selected{% endif %}>Online</option>
+                </select>
+              </td>
+              <td>
+                <span class="view">{{ transaction.payment_note or '-' }}</span>
+                <input type="text" class="form-control form-control-sm edit d-none" name="payment_note" value="{{ transaction.payment_note }}">
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm gap-2">
+                  <button class="icon-gradient gr-bg-blue-h edit-btn" onclick="enableEdit('{{ transaction.id }}')" title="Edit Transaction"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                  <form method="POST" action="{{ url_for('delete_transaction', transaction_id=transaction.id) }}" onsubmit="return confirm('Are you sure you want to delete this transaction?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="icon-gradient gr-bg-red-h delete-btn" title="Delete Invoice"><i class="fa-regular fa-trash-can"></i> Delete</button>
+                  </form>
+                  <form method="POST" action="{{ url_for('edit_transaction', transaction_id=transaction.id) }}" class="d-inline edit-form d-none">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="received_on">
+                    <input type="hidden" name="amount">
+                    <input type="hidden" name="payment_mode">
+                    <input type="hidden" name="payment_note">
+                    <button type="submit" class="icon-gradient gr-bg-green-h update-btn" onclick="submitEdit('{{ transaction.id }}')"><i class="fa-solid fa-floppy-disk"></i> Update</button>
+                    <button type="button" class="icon-gradient gr-bg-red-h cancel-btn" onclick="cancelEdit('{{ transaction.id }}')"><i class="fa-solid fa-square-xmark"></i> Cancel</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="7" class="text-center">No transactions available.</td></tr>
+          {% endfor %}
+        </tbody>
+
+        </table>
+      </div>
+  </div>
+
+  <!-- Hidden field -->
+  <input type="hidden" id="studentIdInput" name="student_id" value="{{ student.id if student else '' }}">
+
+<script>
+  const selectedTable = document.getElementById('selectedInvoicesTable').querySelector('tbody');
+  const invoiceSelectors = document.querySelectorAll('.invoice-selector');
+
+  invoiceSelectors.forEach(cb => {
+    cb.addEventListener('change', function () {
+      const invoiceId = this.dataset.id;
+      const rowId = `row-${invoiceId}`;
+      if (this.checked) {
+        const row = document.createElement('tr');
+        row.id = rowId;
+        row.innerHTML = `
+          <td><input type="hidden" name="invoice_ids" value="${invoiceId}">${invoiceId}</td>
+          <td>${this.dataset.period}</td>
+          <td><input type="date" class="form-control" name="fee_received_on_${invoiceId}" value="{{ today }}"></td>
+          <td>₹${this.dataset.total}</td>
+          <td>₹${this.dataset.pending}</td>
+          <td><input type="number" step="0.01" name="amount_received_${invoiceId}" value="${this.dataset.pending}" class="form-control" required></td>
+          <td>
+            <select name="payment_mode_${invoiceId}" class="form-select">
+              <option value="cash">Cash</option>
+              <option value="online">Online</option>
+            </select>
+          </td>
+          <td><input type="text" name="payment_note" class="form-control" value="${this.dataset.note}"></td>
+        `;
+        selectedTable.appendChild(row);
+      } else {
+        const existing = document.getElementById(rowId);
+        if (existing) existing.remove();
+      }
+    });
+  });
+</script>
+
+<script>
+function enableEdit(id) {
+  const row = document.getElementById(`row-${id}`);
+  row.querySelectorAll('.view').forEach(el => el.classList.add('d-none'));
+  row.querySelectorAll('.edit').forEach(el => el.classList.remove('d-none'));
+
+  row.querySelector('.edit-btn').classList.add('d-none');
+  row.querySelector('.delete-btn').classList.add('d-none');
+  row.querySelector('.edit-form').classList.remove('d-none');
+}
+
+function cancelEdit(id) {
+  const row = document.getElementById(`row-${id}`);
+  row.querySelectorAll('.edit').forEach(el => el.classList.add('d-none'));
+  row.querySelectorAll('.view').forEach(el => el.classList.remove('d-none'));
+
+  row.querySelector('.edit-btn').classList.remove('d-none');
+  row.querySelector('.delete-btn').classList.remove('d-none');
+  row.querySelector('.edit-form').classList.add('d-none');
+}
+
+function submitEdit(id) {
+  const row = document.getElementById(`row-${id}`);
+  const form = row.querySelector('.edit-form');
+
+  form.querySelector('input[name="received_on"]').value = row.querySelector('input[name="received_on"]').value;
+  form.querySelector('input[name="amount"]').value = row.querySelector('input[name="amount"]').value;
+  form.querySelector('input[name="payment_mode"]').value = row.querySelector('input[name="payment_mode"]').value;
+  form.querySelector('input[name="payment_note"]').value = row.querySelector('input[name="payment_note"]').value;
+}
+</script>
+
+
+{% endblock %}

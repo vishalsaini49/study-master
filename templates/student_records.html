@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Enrolled Students - Study Master{% endblock %}
+{% block content %}
+<div class="p-4 col-md-12">
+  <div class="page-head gr-bg-white">
+    <div class="fancy-heading"><i class="bi bi-people fancy-heading"></i> All Students</div>
+    <div class="d-flex gap-3">
+      <a href="{{ url_for('add_student') }}" class="btn-gradient btn-blue"><i class="bi bi-person-add"></i> Add Student</a>
+      <button class="btn-gradient btn-gray multi-delete-btn" data-entity="student"><i class="bi bi-person-x"></i> Delete</button>
+      <a href="{{ url_for('dashboard') }}" class="btn-gradient btn-red" title="Close">×</a>
+    </div>
+  </div>
+
+  <!-- Students Table -->
+  <div class="bg-white border rounded-4 shadow-sm p-4 mb-4">
+    <div class="search-container">
+      <span class="search-text fw-bold"><span class="material-icons fs-2">person_search</span> Search student</span>
+      <div class="input-wrapper">
+        <input type="text" id="studentsStudent" class="search-input" placeholder="🔍 Search by name, class, mobile, or subject...">
+        <button class="clear-button fw-bold" onclick="clearSearch(event)" tabindex="0">x</button>
+      </div>
+    </div>
+    {% if students %}
+    <div class="bg-white border rounded-4 shadow-sm p-4 mb-4">
+      <h5 class="fw-bold text-success mb-3">🧾 Available Student</h5>
+      <div class="table-responsive">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <table class="table table-bordered align-middle" id="tableStudent">
+            <thead class="table-success">
+              <tr>
+        <!-- <table class="table table-bordered table-hover" id="tableStudent">
+          <thead class="custom-header"> -->
+                <th>✅</th>
+                <th>🧑 Name</th>
+                <th>📱 Mobile</th>
+                <th>🎓 Class</th>
+                <th>📚 Subjects</th>
+                <th>💰 Paid?</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for student in students %}
+              <tr data-name="{{ student.name | lower }}" data-class="{{ student.class_name | lower }}" data-mobile="{{ student.mobile | lower }}" data-subjects="{{ ','.join(student.subjects_fees.keys() | map('lower') | map('trim')) }}">
+                <td><input type="checkbox" name="student_ids" class="student-checkbox" value="{{ student.id }}"></td>
+                <td><a href="{{ url_for('view_student', student_id=student.id, from_='students') }}">{{ student.name }}</a></td>
+                <td>{{ student.mobile }}</td>
+                <td>{{ student.class_name }}</td>
+                <td>{% for subject in student.subjects_fees.keys() %}<span class="badge gr-bg-blue-h text-light me-1">{{ subject }}</span>{% endfor %}</td>
+                <td>{% if student.has_unpaid_invoice %}<span class="badge bg-danger">No</span>{% else %}<span class="badge bg-success">Yes</span>{% endif %}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </form>
+      </div>
+    {% else %}
+    <div class="alert alert-info mt-4">No students found.</div>
+    {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

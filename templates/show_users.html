@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}All Users - Study Master{% endblock %}
+
+{% block content %}
+
+<div class="page-head gr-bg-white">
+  <div class="fancy-heading emoji"><i class="bi bi-people"></i> All Registered Users</div>
+  <div class="d-flex gap-3">
+    {% if session['role'] in ['admin', 'developer'] %}
+    <a href="{{ url_for('register_user') }}" class="btn-gradient btn-blue"><i class="bi bi-person-plus"></i> Add New User </a>
+    {% endif %}
+    <a href="{{ url_for('dashboard') }}" class="btn-gradient btn-red" title="Close">×</a>
+  </div>
+</div>
+
+<div class="bg-white border rounded-4 shadow-sm p-4 mb-4">
+  <h5 class="fw-bold text-success mb-3">🔐 Available Users in System</h5>
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle">
+      <thead class="table-success">
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Password</th> <!-- changed from Created On -->
+          <th>Mobile</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ user.name }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ 'Available' if user.password_hash else 'N/A' }}</td>
+        <td>{{ user.mobile }}</td>
+        <td>{{ user.role.capitalize() }}</td>
+        <td class="d-flex gap-2">
+          <a href="{{ url_for('update_profile', user_id=user.id) }}" class="icon-gradient gr-bg-blue-h" title="Update Profile"><i class="fa-solid fa-user-pen"></i></a>
+          <button class="icon-gradient gr-bg-red-h single-delete-btn" title="Remove User" data-id="{{ user.id }}" data-entity="user" {% if user.id == session['user_id'] %}disabled{% endif %}><i class="bi bi-person-x"></i></button>          
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Welcome to Study Master{% endblock %}
+{% block content %}
+
+<h1>🌟 Welcome to Study Master 🌟</h1>
+
+<div class="grid">
+  <a href="{{ url_for('add_student') }}">
+    <div class="card">
+      <div class="emoji"><i class="bi bi-person-add"></i></div>
+      <div class="card-head">Add New Student</div>
+    </div>
+  </a>
+  <div class="card" role="button" data-bs-toggle="modal" data-bs-target="#studentSearchModal" data-back-url="{{ url_for('dashboard') }}" data-source="dashboard" 
+    onclick=" const confirmBtn = document.getElementById('confirmSelection'); confirmBtn.dataset.action = 'create-invoice'; confirmBtn.dataset.source = 'dashboard';">
+    <div class="emoji"><i class="bi bi-pencil-square"></i></div>
+    <div class="card-head">Create New Invoice</div>
+  </div>
+  <div class="card" role="button" data-bs-toggle="modal" data-bs-target="#studentSearchModal" data-back-url="{{ url_for('dashboard') }}"
+     onclick="document.getElementById('confirmSelection').dataset.action = 'receive-payment'">
+  <div class="emoji"><i class="bi bi-cash-coin"></i></div>
+  <div class="card-head">Receive Payment</div>
+</div>
+
+  <a href="{{ url_for('student_records') }}">
+    <div class="card">
+      <div class="emoji"><i class="bi bi-people"></i></div>
+      <div class="card-head">View Students</div>
+      <p class="text-outline text-outline-green">Total Enrolled - {{ total_students }}</p>
+    </div>
+  </a>
+  <a href="{{ url_for('invoices') }}">
+    <div class="card">
+      <div class="emoji"><i class="bi bi-journals"></i></div>
+      <div class="card-head">View Invoices  ({{ total_invoices }})</div>
+      <p><span class="text-outline text-outline-green">Paid - {{ paid_invoices }} / </span> <span class="text-outline text-outline-red">Unpaid - {{ unpaid_invoices }}</span></p>
+    </div>
+  </a>
+  {% if session['role'] in ['admin', 'developer'] %}
+  <a href="{{ url_for('show_users') }}">
+    <div class="card">
+      <div class="emoji"><span class="material-icons bi">supervisor_account</span></div>
+      <div class="card-head">View Users</div>
+      <p class="text-outline text-outline-green">Available Users - {{ total_users }}</p>
+    </div>
+  </a>
+  {% endif %}
+</div>
+
+<hr class="my-4">
+
+<h3 class="mb-3">📊 Dashboard Summary</h3>
+<div class="row text-center">
+  <div class="col-md-6 mb-3">
+    <div class="card p-3 shadow-sm">
+      <h3>Total Collected <i class="bi bi-bank2"></i></h3>
+      <p class="fs-4 fw-bold text-success text-outline text-outline-white">₹ {{ total_collected | round(2) }}</p>
+    </div>
+  </div>
+  <div class="col-md-6 mb-3">
+    <div class="card p-3 shadow-sm">
+      <h3>Total Pending <i class="bi bi-hourglass-top"></i></h3>
+      <p class="fs-4 fw-bold text-danger text-outline text-outline-white">₹ {{ total_pending | round(2) }}</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
