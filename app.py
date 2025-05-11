@@ -578,8 +578,11 @@ def invoice_pdf(invoice_id):
     
     all_transactions = db.session.query(PaymentTransaction, Invoice).join(Invoice).filter(PaymentTransaction.invoice_id == invoice.id).order_by(PaymentTransaction.received_on.desc()).all()
 
+    logo_url = url_for('static', filename='images/logo.png', _external=True)
+    qrcode_url = url_for('static', filename='images/qrcode.jpg', _external=True)
+
     # ✅ Render HTML with extra data
-    rendered = render_template('invoice_pdf.html', invoice=invoice, student=student, subject_fees_dict=subject_fees_dict, total_amount=total_amount, all_transactions=all_transactions)
+    rendered = render_template('invoice_pdf.html', invoice=invoice, student=student, subject_fees_dict=subject_fees_dict, total_amount=total_amount, all_transactions=all_transactions, logo_url=logo_url, qrcode_url=qrcode_url)
 
     options = {'enable-local-file-access': '',  # ✅ Allows local static files
         'quiet': '',                     # Optional: suppress console output
